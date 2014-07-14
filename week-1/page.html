@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <style>
+            #calculator {
+                width: 173px;
+            }
+
+            #calculator-display {
+                border: 1px solid grey;
+                border-radius: 3px;
+                padding: 5px 5px;
+                text-align: right;
+                width: 152px;
+            }
+
+            .calculator-buttons div {
+                border: 1px solid grey;
+                border-radius: 3px;
+                display: inline-block;
+                height: 50px;
+                line-height: 50px;
+                margin-top: 3px;
+                text-align: center;
+                width: 50px;
+                vertical-align: center;
+            }
+
+            .calculator-buttons div:hover {
+                border-color: red;
+            }
+
+            .calculator-buttons div:active {
+                background: red;
+            }
+        </style>
+        <script>
+            var my_max = function(arr) {
+                var max = arr[0];
+                for (var i = 1; i < arr.length; i++) {
+                    if (arr[i] > max) {
+                        max = arr[i];
+                    }
+                }
+                return max;
+            }
+
+            var vowel_count = function(str) {
+                var lowered = str.toLowerCase();
+                var count = 0;
+                for (var i = 0; i < lowered.length; i++) {
+                    if ("aeiouy".indexOf(lowered[i]) >= 0) {
+                        count += 1;
+                    }
+                }
+                return count;
+            }
+
+            var reverse2 = function(str) {
+                var reversed = "";
+                for (var i = str.length - 1; i >= 0; i--) {
+                    reversed += str[i];
+                }
+                return reversed;
+            }
+
+            var word = "elephantyism!"
+            console.log("Num vowels in '" + word + "'", vowel_count(word));
+            console.log("Reverse of '" + word + "' is '" + reverse2(word) + "'");
+
+            //calculator
+            var add = function(a, b) {
+                return a + b;
+            }
+
+            var multiply = function (a, b) {
+                return a * b;
+            }
+
+            var divide = function(a, b) {
+                return a / b;
+            }
+
+            var subtract = function(a, b) {
+                return a - b;
+            }
+
+            //calculator state
+            var lastNum, //the number "saved" by the user hitting an op button
+                currNum = 0, //the current number being entered (or the result)
+                currNumClearOnNext = false, //if true, set currNum to 0 on next num acc
+                currOp = undefined; //operation to do, as a str
+            var display = function(val) {
+                document.getElementById("calculator-display").innerHTML = val;
+                // if (val == "500055")
+            }
+
+            var accNum = function(num) {
+                if (currNumClearOnNext) {
+                    currNum = 0;
+                }
+                currNum = (currNum * 10) + parseInt(num);
+                display(currNum);
+            }
+
+            var setOp = function(op) {
+                currOp = op;
+                lastNum = currNum;
+                currNum = 0;
+                display(currOp);
+            }
+
+            var clearCalc = function() {
+                lastNum = undefined;
+                currNum = 0;
+                currNumClearOnNext = false;
+                currOp = undefined;
+                display(currNum);
+            }
+
+            var calculate = function() {
+                if (currOp === undefined) {
+                    console.error("Can't calculate because we don't have an operation");
+                } else {
+                    if (currOp === "+") {
+                        currNum = add(lastNum, currNum);
+                    } else if (currOp === "-") {
+                        currNum = subtract(lastNum, currNum);
+                    } else if (currOp === "/") {
+                        currNum = divide(lastNum, currNum);
+                    } else if (currOp === "*") {
+                        currNum = multiply(lastNum, currNum);
+                    }
+                    display(currNum);
+                    currNumClearOnNext = true;
+                }
+            }
+        </script>
+    <head>
+    <body>
+        <div id="calculator">
+            <div id="calculator-display">0</div>
+            <div class="calculator-buttons">
+                <div onclick="accNum(1)">1</div>
+                <div onclick="accNum(2)">2</div>
+                <div onclick="accNum(3)">3</div>
+                <div onclick="accNum(4)">4</div>
+                <div onclick="accNum(5)">5</div>
+                <div onclick="accNum(6)">6</div>
+                <div onclick="accNum(7)">7</div>
+                <div onclick="accNum(8)">8</div>
+                <div onclick="accNum(9)">9</div>
+
+                <div onclick="setOp('+')">+</div>
+                <div onclick="setOp('-')">-</div>
+                <div onclick="clearCalc()">C</div>
+
+                <div onclick="setOp('*')">*</div>
+                <div onclick="setOp('/')">/</div>
+                <div onclick="calculate()">=</div>
+            </div>
+        </div>
+    </body>
+</html>
