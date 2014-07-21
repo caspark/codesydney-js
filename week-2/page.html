@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <title>Awesome page</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script>
+            var showHome = function($displayIn) {
+                $displayIn.children().remove()
+                var $copy = $('<p>').text('We make sure you enjoy your meal - cats very welcome!')
+                $displayIn.append($copy)
+            }
+
+            var showMenu = function($displayIn) {
+                $displayIn.children().remove()
+                var $menu = $('<p>').text('Cats, what did you think it was going to be?')
+                var $img1 = $('<img>').attr('src', 'http://journeyforth.files.wordpress.com/2008/09/cat-in-a-pan.jpg')
+                var $img2 = $('<img>').attr('src', 'http://wa1.cdn.morefm.co.nz/morefm/AM/2013/4/18/6842/cat-in-a-cooking-pan.jpg')
+                $displayIn.append($menu, $img1, $img2)
+            }
+
+            var showContact = function($displayIn) {
+                $displayIn.children().remove()
+                var $phoneDetails = $('<p>').text('Mobile: 0402 452 712')
+                var $warning = $('<p>').text('Please do not call to complain about cats.')
+                $displayIn.append($phoneDetails, $warning)
+            }
+
+           $(function() {
+                // create the header
+                var menuLink = function(name, showFunction) {
+                    var $link = $('<a href="#' + name + '">').text(name)
+                    $link.click(showFunction)
+                    return $('<li>').append($link)
+                }
+
+                var $contentDiv = $('#content')
+                var pages = {
+                    'Home': function() { showHome($contentDiv) },
+                    'Menu': function() { showMenu($contentDiv) },
+                    'Contact': function() { showContact($contentDiv) }
+                }
+
+                var currentFragment = window.location.hash
+                var $navlist = $('<ul>').addClass('navlist')
+                for (var name in pages) {
+                    var $navitem = menuLink(name, pages[name])
+                    $navlist.append($navitem)
+                    if ( ('#' + name) == currentFragment) {
+                        pages[name]()
+                    }
+                }
+
+                var $heading = $('<h1>').text('Peking Moon Restaurant')
+                var $header = $('<div>').attr('id', 'header').append($heading).append($navlist)
+                $('body').prepend($header)
+
+                // show the initial tab
+                if (!currentFragment) {
+                    showHome($('#content'))
+                }
+            })
+        </script>
+    </head>
+    <body>
+        <div id="content">
+        </div>
+    <body>
+</html>
