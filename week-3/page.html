@@ -1,0 +1,122 @@
+<html>
+    <head>
+        <title>Awesome page</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script>
+            // game parameters
+            var game = (function() {
+                // config
+                var width =  40,
+                    height = 40,
+                    initialLen = 4,
+                // state
+                // positions are a single number for each segment of the snake
+                // position 0 is the head of the snake
+                    segments = [],
+                // speed controls direction as well; 1 = right, -width = up, etc
+                    speed = 0
+
+                // initial setup: set the head position, and make the tail extend out
+                segments.push(width * (height / 2 + 0.5))
+                for (var i = 1; i < initialLen; i++) {
+                    segments[i] = segments[i - 1] - 1
+                }
+
+                return {
+                    render: function() {
+                        var boardDiv = $('#board').detach().empty(),
+                            type
+                        for (var i = 0; i < width * height; i++) {
+                            if (segments[0] === i) {
+                                type = "snake-head"
+                            } else if (segments.indexOf(i) !== -1) {
+                                type = "snake"
+                            } else {
+                                type = "nothing"
+                            }
+                            var div = $('<div>')
+                            if (type) {
+                                div.addClass(type)
+                            }
+                            boardDiv.append(div)
+                        }
+                        $('body').append(boardDiv)
+                    },
+
+                    update: function() {
+                        // we 'move' the snake by giving it a new head and chopping off its tail
+                        if (speed != 0) {
+                            var nextPos = segments[0] + speed
+                            segments.unshift(nextPos)
+                            segments.pop()
+                            console.debug("Snake is now at", segments)
+                        }
+                    },
+
+                    handleInput: function(input) {
+                        if (input === 'up') {
+                            speed = -width
+                        } else if (input === 'down') {
+                            speed = width
+                        } else if (input === 'left') {
+                            speed = -1
+                        } else if (input === 'right') {
+                            speed = 1
+                        }
+                        console.debug('speed is now', speed)
+                    }
+                }
+            })()
+
+            var tick = function() {
+                game.update()
+                game.render()
+                console.debug("tick")
+            }
+
+            $(function() {
+                game.render()
+
+                $('body').on('keydown', function(e) {
+                    if (e.which === 87) {
+                        game.handleInput('up')
+                    } else if (e.which === 83) {
+                        game.handleInput('down')
+                    } else if (e.which === 65) {
+                        game.handleInput('left')
+                    } else if (e.which === 68) {
+                        game.handleInput('right')
+                    } else {
+                        console.debug('Unrecognised key pressed: ' + e.which)
+                    }
+                })
+
+                var handle = setInterval(tick, 1) 
+            })
+        </script>
+        <style>
+            #board div {
+                display: inline-block;
+                height: 2.5%;
+                overflow: none;
+                width: 2.5%;
+            }
+
+            .snake-head {
+                background-color: pink;
+            }
+
+            .snake {
+                background-color: red;
+            }
+
+            .nothing {
+                border: 1px dotted grey;
+                margin: -1px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="board"></div>
+    </body>
+</html>
