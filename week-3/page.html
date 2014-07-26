@@ -8,30 +8,42 @@
                 // config
                 var width =  40,
                     height = 40,
-                    initialLen = 4,
+                    initialLen = 2,
                 // --- state which needs to be reset ---
-                // positions are a single number for each segment of the snake; 0 is the head
+                // an index in an array for each segment of the snake shows the segment position
                     segments,
                 // speed controls direction as well; 1 = right, -width = up, etc
-                    speed
+                    speed,
+                // position of the apple
+                    apple
+
+                var calculateNewApplePos = function(snakeSegments) {
+                    var candidate
+                    do {
+                        candidate = Math.floor(Math.random() * width * height)
+                    } while (snakeSegments.indexOf(candidate) != -1)
+                    return candidate
+                }
+
 
                 return {
                     reset: function() {
                         segments = []
-                        speed = 0
-
-                        // initial setup: set the head position, and make the tail extend out
                         segments.push(width * (height / 2 + 0.5))
                         for (var i = 1; i < initialLen; i++) {
                             segments[i] = segments[i - 1] - 1
                         }
+                        speed = 0
+                        apple = calculateNewApplePos(segments)
                     },
 
                     render: function() {
                         var boardDiv = $('#board').detach().empty(),
                             type
                         for (var i = 0; i < width * height; i++) {
-                            if (segments[0] === i) {
+                            if (i === apple) {
+                                type = "apple"
+                            } else if (i === segments[0]) {
                                 type = "snake-head"
                             } else if (segments.indexOf(i) !== -1) {
                                 type = "snake"
@@ -48,7 +60,6 @@
                     },
 
                     update: function() {
-                        // we 'move' the snake by giving it a new head and chopping off its tail
                         if (speed != 0) {
                             var nextPos = segments[0] + speed
                             if (nextPos < 0
@@ -58,7 +69,12 @@
                                 this.reset()
                             } else {
                                 segments.unshift(nextPos)
-                                segments.pop()
+                                if (segments[segments.length - 1] == apple) {
+                                    console.debug("Snake finished digesting apple")
+                                    apple = calculateNewApplePos(segments)
+                                } else {
+                                    segments.pop()
+                                }
                                 console.debug("Snake is now at", segments)
                             }
 
@@ -70,7 +86,6 @@
                                     }
                                 }
                             }
-
                         }
                     },
 
@@ -122,6 +137,10 @@
                 height: 2.5%;
                 overflow: none;
                 width: 2.5%;
+            }
+
+            .apple {
+                background-color: green;
             }
 
             .snake-head {
