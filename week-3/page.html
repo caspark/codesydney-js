@@ -65,25 +65,23 @@
                                     || Math.floor(segments[0] / 40) != Math.floor(nextPos / 40) && Math.abs(speed) === 1) {
                                 console.debug("Snake went off the screen")
                                 this.reset()
+                                return
+                            } 
+                            for (var i = 1; i < segments.length; i++) {
+                                if (nextPos === segments[i]) {
+                                    console.debug('Snake collided with self! Segment:', i)
+                                    this.reset()
+                                    return
+                                }
+                            }
+                            segments.unshift(nextPos)
+                            if (segments[segments.length - 1] == apple) {
+                                console.debug("Snake finished digesting apple")
+                                apple = calculateNewApplePos(segments)
                             } else {
-                                segments.unshift(nextPos)
-                                if (segments[segments.length - 1] == apple) {
-                                    console.debug("Snake finished digesting apple")
-                                    apple = calculateNewApplePos(segments)
-                                } else {
-                                    segments.pop()
-                                }
-                                console.debug("Snake is now at", segments)
+                                segments.pop()
                             }
-
-                            for (var i = 0; i < segments.length - 1; i++) {
-                                for (var j = i + 1; j < segments.length; j++) {
-                                    if (segments[i] === segments[j]) {
-                                        console.debug('Snake collided with self! Segment:', j)
-                                        this.reset()
-                                    }
-                                }
-                            }
+                            console.debug("Snake is now at", segments)
                         }
                     },
 
