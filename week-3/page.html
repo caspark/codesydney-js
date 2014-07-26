@@ -62,36 +62,38 @@
                             speed = -1
                         } else if (input === 'right') {
                             speed = 1
+                        } else if (input === 'pause') {
+                            speed = 0
                         }
                         console.debug('speed is now', speed)
                     }
                 }
             })()
 
-            var tick = function() {
-                game.update()
-                game.render()
-                console.debug("tick")
-            }
-
             $(function() {
                 game.render()
 
                 $('body').on('keydown', function(e) {
-                    if (e.which === 87) {
+                    if (e.which === 87) { // W
                         game.handleInput('up')
-                    } else if (e.which === 83) {
+                    } else if (e.which === 83) { // S
                         game.handleInput('down')
-                    } else if (e.which === 65) {
+                    } else if (e.which === 65) { // A
                         game.handleInput('left')
-                    } else if (e.which === 68) {
+                    } else if (e.which === 68) { // D
                         game.handleInput('right')
+                    } else if (e.which === 32 || e.which === 27) { // Space & Esc
+                        game.handleInput('pause')
                     } else {
                         console.debug('Unrecognised key pressed: ' + e.which)
                     }
                 })
 
-                var handle = setInterval(tick, 1) 
+                requestAnimationFrame(function tick() {
+                    game.update()
+                    game.render()
+                    requestAnimationFrame(tick)
+                })
             })
         </script>
         <style>
