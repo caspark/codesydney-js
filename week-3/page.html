@@ -39,20 +39,18 @@
 
                     render: function() {
                         var boardDiv = $('#board').detach().empty(),
-                            type
+                            div
                         for (var i = 0; i < width * height; i++) {
+                            div = $('<div>')
                             if (i === apple) {
-                                type = "apple"
-                            } else if (i === segments[0]) {
-                                type = "snake-head"
-                            } else if (segments.indexOf(i) !== -1) {
-                                type = "snake"
-                            } else {
-                                type = "nothing"
+                                div.addClass("apple")
                             }
-                            var div = $('<div>')
-                            if (type) {
-                                div.addClass(type)
+                            if (i === segments[0]) {
+                                div.addClass("snake-head")
+                            } else if (segments.indexOf(i) !== -1) {
+                                div.addClass("snake")
+                            } else {
+                                div.addClass("nothing")
                             }
                             boardDiv.append(div)
                         }
@@ -81,7 +79,7 @@
                             for (var i = 0; i < segments.length - 1; i++) {
                                 for (var j = i + 1; j < segments.length; j++) {
                                     if (segments[i] === segments[j]) {
-                                        console.debug('Snake collided with self!')
+                                        console.debug('Snake collided with self! Segment:', j)
                                         this.reset()
                                     }
                                 }
@@ -144,11 +142,19 @@
             }
 
             .snake-head {
-                background-color: pink;
+                background-color: cornflowerblue;
             }
 
             .snake {
-                background-color: red;
+                background-color: blue;
+            }
+
+            .apple.snake-head {
+                background-color: turquoise;
+            }
+
+            .apple.snake {
+                background-color: turquoise;
             }
 
             .nothing {
