@@ -25,9 +25,13 @@
                     return candidate
                 }
 
-
                 return {
                     reset: function() {
+                        var boardDiv = $('#board').empty()
+                        for (var i = 0; i < width * height; i++) {
+                            boardDiv.append($('<div>'))
+                        }
+
                         segments = []
                         segments.push(width * (height / 2 + 0.5))
                         for (var i = 1; i < initialLen; i++) {
@@ -38,23 +42,22 @@
                     },
 
                     render: function() {
-                        var boardDiv = $('#board').detach().empty(),
-                            div
+                        var boardDivs = $('#board div'),
+                            cell
+                        boardDivs.removeClass()
                         for (var i = 0; i < width * height; i++) {
-                            div = $('<div>')
+                            cell = $(boardDivs[i])
                             if (i === apple) {
-                                div.addClass("apple")
+                                cell.addClass("apple")
                             }
                             if (i === segments[0]) {
-                                div.addClass("snake-head")
+                                cell.addClass("snake-head")
                             } else if (segments.indexOf(i) !== -1) {
-                                div.addClass("snake")
+                                cell.addClass("snake")
                             } else {
-                                div.addClass("nothing")
+                                cell.addClass("nothing")
                             }
-                            boardDiv.append(div)
                         }
-                        $('body').append(boardDiv)
                     },
 
                     update: function() {
