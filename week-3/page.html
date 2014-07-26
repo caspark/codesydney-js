@@ -9,20 +9,24 @@
                 var width =  40,
                     height = 40,
                     initialLen = 4,
-                // state
-                // positions are a single number for each segment of the snake
-                // position 0 is the head of the snake
-                    segments = [],
+                // --- state which needs to be reset ---
+                // positions are a single number for each segment of the snake; 0 is the head
+                    segments,
                 // speed controls direction as well; 1 = right, -width = up, etc
-                    speed = 0
-
-                // initial setup: set the head position, and make the tail extend out
-                segments.push(width * (height / 2 + 0.5))
-                for (var i = 1; i < initialLen; i++) {
-                    segments[i] = segments[i - 1] - 1
-                }
+                    speed
 
                 return {
+                    reset: function() {
+                        segments = []
+                        speed = 0
+
+                        // initial setup: set the head position, and make the tail extend out
+                        segments.push(width * (height / 2 + 0.5))
+                        for (var i = 1; i < initialLen; i++) {
+                            segments[i] = segments[i - 1] - 1
+                        }
+                    },
+
                     render: function() {
                         var boardDiv = $('#board').detach().empty(),
                             type
@@ -47,9 +51,26 @@
                         // we 'move' the snake by giving it a new head and chopping off its tail
                         if (speed != 0) {
                             var nextPos = segments[0] + speed
-                            segments.unshift(nextPos)
-                            segments.pop()
-                            console.debug("Snake is now at", segments)
+                            if (nextPos < 0
+                                    || nextPos > width * height
+                                    || Math.floor(segments[0] / 40) != Math.floor(nextPos / 40) && Math.abs(speed) === 1) {
+                                console.debug("Snake went off the screen")
+                                this.reset()
+                            } else {
+                                segments.unshift(nextPos)
+                                segments.pop()
+                                console.debug("Snake is now at", segments)
+                            }
+
+                            for (var i = 0; i < segments.length - 1; i++) {
+                                for (var j = i + 1; j < segments.length; j++) {
+                                    if (segments[i] === segments[j]) {
+                                        console.debug('Snake collided with self!')
+                                        this.reset()
+                                    }
+                                }
+                            }
+
                         }
                     },
 
@@ -87,6 +108,7 @@
                     }
                 })
 
+                game.reset()
                 requestAnimationFrame(function tick() {
                     game.update()
                     game.render()
