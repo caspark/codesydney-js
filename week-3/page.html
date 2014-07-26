@@ -110,6 +110,9 @@
             })()
 
             $(function() {
+                var accumulatedTime = 0,
+                    delayBetweenLogicUpdates = 60,
+                    lastTime
                 $('body').on('keydown', function(e) {
                     if (e.which === 87) { // W
                         game.handleInput('up')
@@ -127,8 +130,15 @@
                 })
 
                 game.reset()
-                requestAnimationFrame(function tick() {
-                    game.update()
+                requestAnimationFrame(function tick(currentTime) {
+                    if (lastTime) {
+                        accumulatedTime += currentTime - lastTime
+                    }
+                    if (accumulatedTime > delayBetweenLogicUpdates) {
+                        game.update()
+                        accumulatedTime -= delayBetweenLogicUpdates
+                    }
+                    lastTime = currentTime
                     game.render()
                     requestAnimationFrame(tick)
                 })
