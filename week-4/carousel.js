@@ -26,6 +26,24 @@ $(function() {
                 position: 'absolute',
                 left: '0px'
             })
+
+            // add a jump button for this slide
+            var jumpWidth = 30
+            var jumpHeight = jumpWidth // circular
+            var jumpMargin = 10
+            var jumpButton = $('<input type="button">')
+                .addClass('carousel-jump carousel-button')
+                .attr('value', i + 1)
+                .width(jumpWidth)
+                .height(jumpHeight)
+                .css({
+                    left: width / 2 - jumpWidth * slides.length + i * (jumpWidth + jumpMargin),
+                    'top': height - jumpHeight - jumpMargin
+                })
+                .click(function (e) {
+                    switchToSlide(i, current, current < i)
+                })
+                .insertAfter(slide)
         })
         carousel.height(height)
         carousel.width(width)
@@ -53,9 +71,19 @@ $(function() {
             button.width(button.height())
         })
 
+        var updateJumpButtons = function() {
+            var jumpButtons = $('.carousel-jump')
+            jumpButtons.removeClass('carousel-jump-current')
+            $(jumpButtons.get(current)).addClass('carousel-jump-current')
+        }
+        updateJumpButtons()
+
         /** If newFromRight is true: old slide is leaving left, new slide is coming from right */
         var switchToSlide = function(num, old, newFromRight) {
-            if (animating) {
+            if (num == old) {
+                console.debug('Not transitioning because already on', num)
+                return
+            } else if (animating) {
                 console.debug('Not transitioning', old, '->', num, 'because transition is in progress')
                 return
             }
@@ -85,6 +113,7 @@ $(function() {
                 complete: function() {
                     oldSlide.hide()
                     current = num
+                    updateJumpButtons()
                     animating = false
                 }
             })
