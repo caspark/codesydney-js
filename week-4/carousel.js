@@ -8,6 +8,7 @@ $(function() {
         var current = 0
         var count = slides.length
         var animating = false
+        var scheduleIntervalHandle = undefined
 
         slides.each(function(i, slide) {
             slide = $(slide)
@@ -114,6 +115,7 @@ $(function() {
                     oldSlide.hide()
                     current = num
                     updateJumpButtons()
+                    scheduleShowNext() // make sure we don't switch straight after finishing
                     animating = false
                 }
             })
@@ -133,5 +135,13 @@ $(function() {
             }
             switchToSlide(newCurrent, prev, false)
         }
+
+        var scheduleShowNext = function() {
+            if (scheduleIntervalHandle != undefined) {
+                clearInterval(scheduleIntervalHandle)
+            }
+            scheduleIntervalHandle = setInterval(showNext, 2000)
+        }
+        scheduleShowNext()
     })
 })
