@@ -5,6 +5,10 @@
         <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
         <script src="carousel.js"></script>
         <style>
+            *, *:before, *:after {
+                box-sizing: border-box;
+            }
+
             .slide.hidden {
                 display: none;
             }
@@ -13,13 +17,37 @@
                 position: relative;
             }
 
-            .carousel .carousel-prev {
+            .carousel-button {
+                background-color: black;
+                border: 2px black solid;
+                border-radius: 100%;
+                color: #999;
+                cursor: pointer;
+                font-size: 200%;
+                margin: 0px;
+                opacity: 0.5;
+                padding: 0px;
                 position: absolute;
+            }
+
+            .carousel-button:hover {
+                border: 2px #999 solid;
+            }
+
+            .carousel-button:active {
+                color: white;
+                border: 2px white solid;
+            }
+
+            .carousel-button:focus {
+                outline: none;
+            }
+
+            .carousel-prev {
                 left: 0px;
             }
 
-            .carousel .carousel-next {
-                position: absolute;
+            .carousel-next {
                 right: 0px;
             }
         </style>

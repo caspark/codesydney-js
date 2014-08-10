@@ -25,25 +25,29 @@ $(function() {
             slide.width(width)
             slide.height(height)
         })
+        console.log('locked width & height:', width, height)
 
         var prevButton = $('<input type="button">')
-            .addClass('carousel-prev')
-            .attr('value', 'Prev')
+            .addClass('carousel-prev carousel-button')
+            .attr('value', '<')
             .click(function() {
                 showPrev()
             })
         carousel.prepend(prevButton)
         prevButton.css('top', height / 2 + prevButton.height() / 2)
         var nextButton = $('<input type="button">')
-            .addClass('carousel-next')
-            .attr('value', 'Next')
+            .addClass('carousel-next carousel-button')
+            .attr('value', '>')
             .click(function(e) {
                 showNext()
             })
         carousel.append(nextButton)
         nextButton.css('top', height / 2 + nextButton.height() / 2)
 
-        console.log('locked width & height:', width, height)
+        $('.carousel-button').each(function (i, e) {
+            var button = $(e)
+            button.width(button.height())
+        })
 
         var showSlide = function(num, old) {
             console.debug('Going from', old, 'to', num)
