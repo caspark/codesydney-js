@@ -1,6 +1,3 @@
-// handy controls for debugging
-var c = {}
-
 $(function() {
     $('.carousel').each(function(i, carousel) {
         carousel = $(carousel)
@@ -107,8 +104,5 @@ $(function() {
             }
             switchToSlide(newCurrent, prev, false)
         }
-
-        c.showNext = showNext
-        c.showPrev = showPrev
     })
 })
