@@ -26,15 +26,27 @@ $(function() {
             slide.height(height)
         })
 
-        var nextButton = $('<input type="button">').addClass('carousel-next').text('Next')
-        console.log(nextButton)
-        carousel.prepend(nextButton)
-        var prevButton = $('<input type="button">').addClass('carousel-prev').text('Prev')
-        carousel.append(prevButton)
+        var prevButton = $('<input type="button">')
+            .addClass('carousel-prev')
+            .attr('value', 'Prev')
+            .click(function() {
+                showPrev()
+            })
+        carousel.prepend(prevButton)
+        prevButton.css('top', height / 2 + prevButton.height() / 2)
+        var nextButton = $('<input type="button">')
+            .addClass('carousel-next')
+            .attr('value', 'Next')
+            .click(function(e) {
+                showNext()
+            })
+        carousel.append(nextButton)
+        nextButton.css('top', height / 2 + nextButton.height() / 2)
 
         console.log('locked width & height:', width, height)
 
         var showSlide = function(num, old) {
+            console.debug('Going from', old, 'to', num)
             var newSlide = $(slides.get(num))
             var oldSlide = $(slides.get(old))
             oldSlide.hide()
@@ -51,7 +63,7 @@ $(function() {
             var prev = current
             current = current - 1
             if (current < 0) {
-                current = slides - current
+                current = slides.length - 1 + current
             }
             showSlide(current, prev)
         }
