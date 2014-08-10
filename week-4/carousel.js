@@ -94,7 +94,7 @@ $(function() {
             var prev = current
             current = current - 1
             if (current < 0) {
-                current = slides.length - 1 + current
+                current = slides.length + current
             }
             showSlide(current, prev, false)
         }
