@@ -10,6 +10,7 @@ $(function() {
         var height = 0
         var current = 0
         var count = slides.length
+        var animating = false
 
         slides.each(function(i, slide) {
             slide = $(slide)
@@ -56,14 +57,20 @@ $(function() {
         })
 
         /** If newFromRight is true: old slide is leaving left, new slide is coming from right */
-        var showSlide = function(num, old, newFromRight) {
-            console.debug('Going from', old, 'to', num)
+        var switchToSlide = function(num, old, newFromRight) {
+            if (animating) {
+                console.debug('Not transitioning', old, '->', num, 'because transition is in progress')
+                return
+            }
+            console.debug('Transitioning', old, '->', num)
             var newSlide = $(slides.get(num))
             var oldSlide = $(slides.get(old))
+
             var onLeft = -width + 'px'
             var onCenter = '0px'
             var onRight = width + 'px'
 
+            animating = true
             newSlide.css({
                 left: newFromRight ? onRight : onLeft
             })
@@ -80,23 +87,25 @@ $(function() {
             {
                 complete: function() {
                     oldSlide.hide()
+                    current = num
+                    animating = false
                 }
             })
         }
         
         var showNext = function() {
             var prev = current
-            current = (current + 1) % slides.length
-            showSlide(current, prev, true)
+            var newCurrent = (current + 1) % slides.length
+            switchToSlide(newCurrent, prev, true)
         }
 
         var showPrev = function() {
             var prev = current
-            current = current - 1
-            if (current < 0) {
-                current = slides.length + current
+            var newCurrent = current - 1
+            if (newCurrent < 0) {
+                newCurrent = slides.length + newCurrent
             }
-            showSlide(current, prev, false)
+            switchToSlide(newCurrent, prev, false)
         }
 
         c.showNext = showNext
