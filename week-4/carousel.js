@@ -16,7 +16,7 @@ $(function() {
             width = Math.max(slide.width(), width)
             height = Math.max(slide.height(), height)
             if (i != 0) {
-                slide.addClass('hidden')
+                slide.hide()
             }
         })
 
@@ -24,7 +24,13 @@ $(function() {
             slide = $(slide)
             slide.width(width)
             slide.height(height)
+            slide.css({
+                position: 'absolute',
+                left: '0px'
+            })
         })
+        carousel.height(height)
+        carousel.width(width)
         console.log('locked width & height:', width, height)
 
         var prevButton = $('<input type="button">')
@@ -49,18 +55,39 @@ $(function() {
             button.width(button.height())
         })
 
-        var showSlide = function(num, old) {
+        /** If newFromRight is true: old slide is leaving left, new slide is coming from right */
+        var showSlide = function(num, old, newFromRight) {
             console.debug('Going from', old, 'to', num)
             var newSlide = $(slides.get(num))
             var oldSlide = $(slides.get(old))
-            oldSlide.hide()
+            var onLeft = -width + 'px'
+            var onCenter = '0px'
+            var onRight = width + 'px'
+
+            newSlide.css({
+                left: newFromRight ? onRight : onLeft
+            })
             newSlide.show()
+            oldSlide.css({
+                left: '0px'
+            })
+            newSlide.animate({
+                left: '0px'
+            })
+            oldSlide.animate({
+                left: newFromRight ? onLeft : onRight
+            },
+            {
+                complete: function() {
+                    oldSlide.hide()
+                }
+            })
         }
         
         var showNext = function() {
             var prev = current
             current = (current + 1) % slides.length
-            showSlide(current, prev)
+            showSlide(current, prev, true)
         }
 
         var showPrev = function() {
@@ -69,7 +96,7 @@ $(function() {
             if (current < 0) {
                 current = slides.length - 1 + current
             }
-            showSlide(current, prev)
+            showSlide(current, prev, false)
         }
 
         c.showNext = showNext

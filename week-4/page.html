@@ -2,18 +2,14 @@
     <head>
         <title>Awesome page</title>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
         <script src="carousel.js"></script>
         <style>
             *, *:before, *:after {
                 box-sizing: border-box;
             }
 
-            .slide.hidden {
-                display: none;
-            }
-
             .carousel {
+                overflow: hidden;
                 position: relative;
             }
 
@@ -28,6 +24,7 @@
                 opacity: 0.5;
                 padding: 0px;
                 position: absolute;
+                z-index: 50;
             }
 
             .carousel-button:hover {
