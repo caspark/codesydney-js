@@ -59,7 +59,7 @@ $(function() {
             }
             var clicked = e.target;
             board.children().each(function(i, squareElem) {
-                if (clicked == squareElem) {
+                if (clicked == squareElem && !playerFromPos(i)) {
                     moves.push(i);
                     update();
                 }
