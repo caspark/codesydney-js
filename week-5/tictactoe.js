@@ -43,7 +43,6 @@ $(function() {
         })
 
         var winner = calculateWinner();
-        console.debug('Current winner', winner);
         if (winner) {
             status.text(winner + ' is the winner!');
         }
