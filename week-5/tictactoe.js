@@ -1,7 +1,12 @@
 $(function() {
     var status = $('#status'),
         board = $('#board'),
-        moves = []; // index = move number, value = position
+        moves = [], // index = move number, value = position
+        winConditions = [ // positions which constitute a win if the same player occupies all slots
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
 
     function playerFromMove(moveNum) {
         return moveNum % 2 == 0 ? 'X' : 'O';
@@ -22,9 +27,12 @@ $(function() {
     }
 
     function calculateWinner() {
-        return findCommonPlayer(0, 1, 2) || findCommonPlayer(3, 4, 5) || findCommonPlayer(6, 7, 8) ||
-            findCommonPlayer(0, 3, 6) || findCommonPlayer(1, 4, 7) || findCommonPlayer(2, 5, 8) ||
-            findCommonPlayer(0, 4, 8) || findCommonPlayer(2, 4, 6);
+        for (var i = 0; i < winConditions.length; i++) {
+            var winner = findCommonPlayer.apply(this, winConditions[i]);
+            if (winner) {
+                return winner;
+            }
+        }
     }
 
     function update() {
