@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>Awesome page</title>
+        <style>
+            #board div {
+                border: 1px solid black;
+                float: left;
+                font-size: 300%;
+                height: 50px;
+                text-align: center;
+                width: 50px;
+            }
+
+            #board div:nth-child(3n + 1) {
+                clear: left;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Tic Tac Toe</h1>
+        <div id="board"></div>
+        <div id="status"></div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="tictactoe.js"></script>
+   </body>
+</html>
