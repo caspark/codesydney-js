@@ -9,7 +9,7 @@ $(function() {
         ];
 
     function playerFromMove(moveNum) {
-        return moveNum % 2 == 0 ? 'X' : 'O';
+        return moveNum % 2 === 0 ? 'X' : 'O';
     }
 
     function playerFromPos(position) {
@@ -21,7 +21,7 @@ $(function() {
 
     function findCommonPlayer(pos1, pos2, pos3) {
         var playerFromPos1 = playerFromPos(pos1);
-        if (playerFromPos1 == playerFromPos(pos2) && playerFromPos1 == playerFromPos(pos3)) {
+        if (playerFromPos1 === playerFromPos(pos2) && playerFromPos1 === playerFromPos(pos3)) {
             return playerFromPos1;
         }
     }
