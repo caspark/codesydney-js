@@ -115,7 +115,7 @@ var WIDTH = 800,
     INITIAL_BUNKER_COUNT = 3,
     BUNKER_MARGIN = 50,
     FRIENDLY_MISSILE_SPEED = 5,
-    MAX_EXPLOSION_RADIUS = 30,
+    MAX_EXPLOSION_RADIUS = 50,
 // handy reference to canvas to draw on
     canvas;
 
