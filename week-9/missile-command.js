@@ -1,16 +1,20 @@
-var canvasHelper = {
-    /* draws a circle centered at the given coordinates. Defaults to filled, with no stroke. */
-    drawCircle: function(ctx, x, y, radius, filled, stroked) {
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, 2 * Math.PI);
-        if (filled || filled === undefined) {
-            ctx.fill();
-        }
-        if (stroked) {
-            ctx.stroke();
-        }
-    }
-};
+// config
+var WIDTH = 800,
+    HEIGHT = 600,
+    FLOOR_Y = 550,
+    INITIAL_BUNKER_COUNT = 3,
+    BUNKER_MARGIN = 50,
+    BUNKER_RADIUS = 50,
+    FRIENDLY_MISSILE_SPEED = 10,
+    ENEMY_MISSILE_SPEED = 2,
+    ENEMY_MISSILE_STARTING_DELAY = 250,
+    MAX_EXPLOSION_RADIUS = 50,
+// handy reference to canvas to draw on
+    canvas;
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
 
 function Bunker(x, y) {
     this.x = x;
@@ -19,33 +23,39 @@ function Bunker(x, y) {
     this.draw = function(ctx) {
         ctx.fillStyle = "#39AB17";
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 50, Math.PI, 2 * Math.PI);
+        ctx.arc(this.x, this.y, BUNKER_RADIUS, Math.PI, 2 * Math.PI);
         ctx.fill();
     };
+
+    this.radius = function() {
+        return BUNKER_RADIUS;
+    }
 }
 
-function Missile(x, y, speed, destX, destY) {
+function Missile(x, y, friendly, destX, destY) {
     this.x = x;
     this.origX = x;
     this.y = y;
     this.origY = y;
-    this.speed = speed;
+    this.friendly = friendly;
+    this.speed = friendly ? FRIENDLY_MISSILE_SPEED : ENEMY_MISSILE_SPEED;
     this.destX = destX;
     this.destY = destY;
     this.missileRadius = 4;
 
     this.draw = function(ctx) {
         if (this.isExploding()) {
-            ctx.fillStyle = "#FFB000";
+            ctx.fillStyle = '#FFB000';
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.explosionRadius, 0, 2 * Math.PI);
             ctx.fill();
         } else {
-            ctx.fillStyle = "#FF0000";
+            ctx.fillStyle = friendly ? '#316EC1' : '#FF0000';
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.missileRadius, 0, 2 * Math.PI);
             ctx.fill();
 
+            ctx.strokeStyle = ctx.fillStyle;
             ctx.beginPath();
             ctx.moveTo(this.origX, this.origY);
             ctx.lineTo(this.x, this.y);
@@ -56,18 +66,21 @@ function Missile(x, y, speed, destX, destY) {
     
     this.move = function() {
         if (this.isExploding()) {
-            this.explosionRadius = Math.min(this.explosionRadius + 2, MAX_EXPLOSION_RADIUS);
+            this.explosionRadius = Math.min(this.explosionRadius + .5, MAX_EXPLOSION_RADIUS);
         } else {
             var xDiff = this.destX - this.origX;
             var yDiff = this.destY - this.origY;
             var angle = Math.atan2(yDiff, xDiff);
 
-            this.x = this.x + speed * Math.cos(angle);
-            this.y = this.y + speed * Math.sin(angle);
+            this.x = this.x + this.speed * Math.cos(angle);
+            this.y = this.y + this.speed * Math.sin(angle);
             var arrived = xDiff < 0 && this.x < this.destX 
                 || xDiff > 0 && this.x > this.destX;
-            if (arrived) {
+            if (arrived || this.y > FLOOR_Y) {
                 this.triggerExplosion();
+            }
+            if (this.y > FLOOR_Y) {
+                this.y = FLOOR_Y;
             }
         }
     }
@@ -103,26 +116,18 @@ function Missile(x, y, speed, destX, destY) {
 
     this.triggerExplosion = function() {
         if (!this.isExploding()) {
-            this.explosionRadius = 0;
+            this.explosionRadius = this.missileRadius;
         }
     }
 }
 
-// config
-var WIDTH = 800,
-    HEIGHT = 600,
-    FLOOR_Y = 550,
-    INITIAL_BUNKER_COUNT = 3,
-    BUNKER_MARGIN = 50,
-    FRIENDLY_MISSILE_SPEED = 5,
-    MAX_EXPLOSION_RADIUS = 50,
-// handy reference to canvas to draw on
-    canvas;
 
 var game = (function() {
     // --- state which needs to be reset ---
+    var enemyMissileNextDelay, // # updates required before firing next missile
+        updatesSinceLastMissile, // # updates since last missile fired
     // array of missile objects
-    var missiles,
+        missiles,
     // bunkers which shoot player missiles
         bunkers;
 
@@ -140,15 +145,14 @@ var game = (function() {
                 console.debug(bunkerX);
                 bunkers.push(new Bunker(bunkerX, FLOOR_Y));
             }
+
+            enemyMissileNextDelay = ENEMY_MISSILE_STARTING_DELAY;
+            updatesSinceLastMissile = 0;
         },
 
         render: function() {
             var ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height); 
-
-            // draw ground
-            ctx.fillStyle = "#6B521F";
-            ctx.fillRect(0, FLOOR_Y, WIDTH, HEIGHT);
 
             for (var i = 0; i < bunkers.length; i++) {
                 bunkers[i].draw(ctx);
@@ -157,9 +161,24 @@ var game = (function() {
             for (var i = 0; i < missiles.length; i++) {
                 missiles[i].draw(ctx);
             }
+
+            // draw ground last so it covers any explosions
+            ctx.fillStyle = "#6B521F";
+            ctx.fillRect(0, FLOOR_Y, WIDTH, HEIGHT);
+
+            if (bunkers.length == 0) {
+                ctx.fillStyle = "#0000ff";
+                ctx.font = '100pt Serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('You lose!', WIDTH / 2, HEIGHT / 2 + 25);
+            }
         },
 
         update: function() {
+            if (bunkers.length == 0) {
+                return;
+            }
+
             for (var i = 0; i < missiles.length; i++) { 
                 missiles[i].move();
             }
@@ -173,20 +192,38 @@ var game = (function() {
                         otherMissile.triggerExplosion();
                     }
                 }
+
+                for (var j = 0; j < bunkers.length; j++) {
+                    var bunker = bunkers[j];
+                    if ((!missile.friendly || missile.isExploding()) && missile.collidesWith(bunker.x, bunker.y, bunker.radius())) {
+                        missile.triggerExplosion();
+                        bunkers.splice(j, 1);
+                        j =- 1;
+                    }
+                }
+
                 if (missile.isDead()) {
                     missiles.splice(i, 1);
                     i =- 1;
                 }
             }
+
+            if (missiles.length == 0 || updatesSinceLastMissile >= enemyMissileNextDelay) {
+                this.fireEnemyMissile();
+                updatesSinceLastMissile = 0;
+                enemyMissileNextDelay = enemyMissileNextDelay * 0.9
+            } else {
+                updatesSinceLastMissile += 1;
+            }
         },
 
         fireFriendlyMissile: function(destX, destY) {
-            console.debug("Should now fire friendly missile at", destX, destY);
+            console.debug('Should now fire friendly missile at', destX, destY);
 
             // find the closest bunker
             var closestBunker = this.findClosestBunkerTo(destX);
             console.debug('Firing from', closestBunker);
-            var missile = new Missile(closestBunker.x, closestBunker.y, FRIENDLY_MISSILE_SPEED, destX, destY);
+            var missile = new Missile(closestBunker.x, closestBunker.y, true, destX, destY);
             missiles.push(missile);
         },
 
@@ -201,6 +238,18 @@ var game = (function() {
                 }
             });
             return closestBunker;
+        },
+
+        fireEnemyMissile: function(destX, destY) {
+            if (bunkers.length == 0) {
+                return;
+            }
+            var targetBunker = bunkers[getRandomInt(0, bunkers.length)];
+            var originX = getRandomInt(0, WIDTH);
+            console.debug('Firing enemy missile at bunker', targetBunker, 'from', originX);
+
+            var missile = new Missile(originX, 0, false, targetBunker.x, targetBunker.y);
+            missiles.push(missile);
         }
     };
 })()
