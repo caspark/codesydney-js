@@ -281,14 +281,14 @@ $(function() {
 });
 
 // wonderfully complex way to get the x/y coords of a click: http://stackoverflow.com/a/5932203
-function getMouseCoordinates(canvas, event){
+function getMouseCoordinates(canvas, event) {
     var totalOffsetX = 0;
     var totalOffsetY = 0;
     var canvasX = 0;
     var canvasY = 0;
     var currentElement = canvas;
 
-    do{
+    do {
         totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
         totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
     }
@@ -297,5 +297,5 @@ function getMouseCoordinates(canvas, event){
     canvasX = event.pageX - totalOffsetX;
     canvasY = event.pageY - totalOffsetY;
 
-    return { x: canvasX, y: canvasY }
+    return { x: canvasX, y: canvasY };
 }
