@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style type="text/css">
+      html, body { height: 100%; margin: 0; padding: 0;}
+
+      #map-canvas {
+        height: 75%;
+      }
+
+      #search-box {
+        font-size: 30px;
+      }
+
+      #search-box {
+        font-size: 30px;
+      }
+
+      #result-box {
+        background-color: white;
+        color: red;
+        font-size: 24px;
+        text-align: center;
+      }
+
+      #detail-box {
+        height: 25%;
+        overflow: scroll;        
+      }
+    </style>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&region=au">
+    </script>
+
+    <script type="text/javascript">
+      function initialize() {
+        var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer();
+       
+        var map = new google.maps.Map(document.getElementById('map-canvas'),
+        {
+          center: { lat: -34.397, lng: 150.644},
+          zoom: 8
+        });
+        directionsRenderer.setMap(map);
+
+        var resultBox = document.createElement('span');
+        resultBox.id = 'result-box';
+        resultBox.innerHTML = 'Status: waiting for input...'
+        map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(resultBox);
+        
+        var detailBox = document.createElement('div');
+        detailBox.id = 'detail-box'
+        directionsRenderer.setPanel(detailBox);
+        document.body.appendChild(detailBox);
+
+        var textbox = document.createElement('input');
+        textbox.type = 'text';
+        textbox.placeholder = 'Directions from Sydney to...';
+        textbox.id = 'search-box';
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(textbox);
+        
+        google.maps.event.addDomListener(textbox, 'keypress', function(e) {
+          if (e.charCode == 13) {
+            console.debug('Going to search for', textbox.value);
+            var request = {
+              origin: 'Sydney, Australia',
+              destination: textbox.value,
+              travelMode: google.maps.TravelMode.TRANSIT
+            };
+            resultBox.innerHTML = 'Status: Requesting...';
+            directionsRenderer.setDirections({routes: []});
+            directionsService.route(request, function(response, status) {
+              resultBox.innerHTML = 'Status: ' + status;
+              if (status == google.maps.DirectionsStatus.OK) {
+                console.debug('Good Google response of', response);
+                directionsRenderer.setDirections(response);
+              } else {
+                console.error('Google is not helping us :(', status, response);
+              }
+            })
+          }
+        }); 
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+<div id="map-canvas"></div>
+  </body>
+</html>
